@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand */
+  --color-navy-50: #eef2f7;
+  --color-navy-100: #d6dde7;
+  --color-navy-500: #1a3a66;
+  --color-navy-700: #0a2a52;
+  --color-navy-900: #001e40;
+
+  --color-teal-50: #e6f3f3;
+  --color-teal-100: #c8e6e6;
+  --color-teal-500: #00a3a6;
+  --color-teal-700: #008789;
+  --color-teal-900: #00696b;
+
+  --color-accent-300: #ffd84d;
+  --color-accent-500: #f1c109;
+  --color-accent-700: #b08a00;
+  --color-accent-text: #241a00;
+
+  /* Neutrals */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafb;
+  --color-surface-subtle: #eceeef;
+  --color-border: #e1e3e4;
+  --color-divider: #c3c6d1;
+  --color-text-muted: #737780;
+  --color-text-strong: #191c1d;
+
+  /* Status */
+  --color-success: #00a36c;
+  --color-warning: #f1c109;
+  --color-danger: #d3302f;
+
+  /* Radii */
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0px 12px 32px 0px rgba(25, 28, 29, 0.06);
+  --shadow-button-accent: 0px 4px 7px rgba(241, 193, 9, 0.39);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(
+    134.54deg,
+    var(--color-surface-muted) 0%,
+    var(--color-surface-subtle) 100%
+  );
+  color: var(--color-text-strong);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
