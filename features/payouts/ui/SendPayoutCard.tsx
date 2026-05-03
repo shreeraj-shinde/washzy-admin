@@ -11,10 +11,12 @@ import { Textarea } from "@/shared/ui/Textarea";
 import { Button } from "@/shared/ui/Button";
 import { useCentersList } from "@/features/centers";
 import { useSendPayout } from "../hooks/usePayouts";
+import { useState } from "react";
+import { generateUID } from "@/shared/lib/utils";
 
 const schema = z.object({
   centerId: z.string().min(1, "Select a center"),
-  amountInr: z.number().positive("Enter an amount"),
+  amount: z.number().positive("Enter an amount"),
   remarks: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
@@ -27,8 +29,10 @@ export function SendPayoutCard() {
     defaultValues: { centerId: "", remarks: "" },
   });
 
+  const [idempotencyKey, setidempotencyKey] = useState(() => generateUID());
+
   const submit = handleSubmit(async (values) => {
-    await send.mutateAsync(values);
+    await send.mutateAsync({ ...values, idempotencyKey });
     reset();
   });
 
@@ -42,27 +46,27 @@ export function SendPayoutCard() {
       </header>
 
       <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-        <Field label="Service Center" error={formState.errors.centerId?.message}>
+        <Field
+          label="Service Center"
+          error={formState.errors.centerId?.message}
+        >
           <Select {...register("centerId")}>
             <option value="">Select a destination center</option>
             {centers?.items.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.centerName}
+                {c.name}
               </option>
             ))}
           </Select>
         </Field>
 
-        <Field
-          label="Amount (Rupees)"
-          error={formState.errors.amountInr?.message}
-        >
+        <Field label="Amount (Rupees)" error={formState.errors.amount?.message}>
           <Input
             type="number"
             step="any"
             inputMode="decimal"
             placeholder="₹ 0.00"
-            {...register("amountInr", { valueAsNumber: true })}
+            {...register("amount", { valueAsNumber: true })}
           />
         </Field>
 

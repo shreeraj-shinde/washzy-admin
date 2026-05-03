@@ -1,11 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  listPayouts,
-  sendPayout,
-  getPayoutSummary,
-} from "../api/payouts.api";
+import { listPayouts, sendPayout, getPayoutSummary } from "../api/payouts.api";
 import type { SendPayoutPayload } from "../api/payouts.types";
 
 export function usePayouts() {

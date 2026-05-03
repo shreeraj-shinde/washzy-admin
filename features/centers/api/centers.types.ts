@@ -1,28 +1,37 @@
 export type CenterTier = "STANDARD" | "ACTIVE" | "PREMIUM";
 export type CenterStatus = "DRAFT" | "INACTIVE" | "ACTIVE";
 
-export type SettlementAccount = {
+enum ServiceTier {
+  STANDARD_WASH = "STANDARD_WASH",
+  PREMIUM_DETAIL = "PREMIUM_DETAIL",
+  PRESIDENTIAL_LUXE = "PRESIDENTIAL_LUXE",
+}
+
+export type BankAccount = {
   accountHolderName: string;
-  /** Backend returns the masked form (last-4 only). */
-  accountNumberMasked: string;
+  accountNumber: string;
   ifscCode: string;
 };
 
 export type Center = {
   id: string;
-  centerName: string;
-  status: CenterStatus;
-  tier: CenterTier;
+  name: string;
   phone: string;
-  isPhoneVerified: boolean;
   address: string;
   latitude: number;
   longitude: number;
   images: string[];
-  settlement?: SettlementAccount;
+  tier: CenterTier;
+  status: CenterStatus;
+  isOtpVerified: Boolean;
+  serviceTiers: ServiceTier[];
+  isActive: Boolean;
+  bankAccount: BankAccount;
   createdAt: string;
   updatedAt: string;
 };
+
+
 
 export type CenterListQuery = {
   page?: number;

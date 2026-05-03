@@ -35,6 +35,10 @@
   --color-warning: #f1c109;
   --color-danger: #d3302f;
 
+  /* Others */
+  --color-mercury: #e6e8e9;
+  --color-gravel: #43474f;
+
   /* Radii */
   --radius-card: 16px;
   --radius-pill: 9999px;

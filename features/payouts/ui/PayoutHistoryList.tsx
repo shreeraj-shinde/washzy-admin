@@ -38,7 +38,9 @@ export function PayoutHistoryList() {
             ))
           : isError
             ? null
-            : (data?.items ?? []).map((p) => <PayoutRow key={p.id} payout={p} />)}
+            : (data?.items ?? []).map((p) => (
+                <PayoutRow key={p.id} payout={p} />
+              ))}
       </ul>
 
       <button
@@ -59,10 +61,10 @@ function PayoutRow({ payout }: { payout: Payout }) {
       </span>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-navy-900 truncate">
-          {payout.centerName}
+          {payout.center.name}
         </p>
         <p className="text-xs text-text-muted truncate">
-          ID: {payout.txnRef} ·{" "}
+          ID: {payout.txnNumber} ·{" "}
           {new Date(payout.createdAt).toLocaleDateString("en-IN", {
             day: "numeric",
             month: "short",
@@ -72,7 +74,7 @@ function PayoutRow({ payout }: { payout: Payout }) {
       </div>
       <div className="flex flex-col items-end gap-1">
         <span className="text-sm font-semibold text-navy-900">
-          ₹ {payout.amountInr.toLocaleString("en-IN")}
+          ₹ {payout.amount.toLocaleString("en-IN")}
         </span>
         <PayoutStatusBadge status={payout.status} />
       </div>

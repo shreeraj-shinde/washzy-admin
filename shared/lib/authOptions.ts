@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.idToken) return null;
 
-        const res = await fetch(`${env.apiBaseUrl}/api/v1/auth/login`, {
+        const res = await fetch(`${env.apiBaseUrl}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

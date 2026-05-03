@@ -3,9 +3,8 @@ import type { ApiSuccess, Paginated } from "@/shared/types/api";
 import type { Payout, SendPayoutPayload } from "./payouts.types";
 
 export async function listPayouts(): Promise<Paginated<Payout>> {
-  const res = await apiClient.get<ApiSuccess<Paginated<Payout>>>(
-    "/admin/payouts",
-  );
+  const res =
+    await apiClient.get<ApiSuccess<Paginated<Payout>>>("/admin/payouts");
   return res.data.data;
 }
 

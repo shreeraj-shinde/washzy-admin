@@ -19,5 +19,6 @@ export async function listCenters(
 
 export async function getCenter(id: string): Promise<Center> {
   const res = await apiClient.get<ApiSuccess<Center>>(`/admin/centers/${id}`);
+
   return res.data.data;
 }

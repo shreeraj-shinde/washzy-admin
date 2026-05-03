@@ -11,14 +11,14 @@ export function CenterCard({ center }: Props) {
     <Card>
       <div className="bg-navy-900 text-white px-6 py-5 flex flex-col gap-2">
         <TierBadge tier={center.tier} />
-        <h3 className="text-lg font-semibold">{center.centerName}</h3>
+        <h3 className="text-lg font-semibold">{center.name}</h3>
       </div>
 
       <div className="px-6 py-5 flex flex-col gap-5">
         <Field
           icon={<Phone size={14} />}
           label="Primary Contact"
-          accessory={center.isPhoneVerified ? <OtpVerifiedBadge /> : null}
+          accessory={center.isOtpVerified ? <OtpVerifiedBadge /> : null}
         >
           <p className="text-sm font-medium text-navy-900">{center.phone}</p>
         </Field>
@@ -28,23 +28,25 @@ export function CenterCard({ center }: Props) {
             {center.address}
           </p>
           <p className="mt-2 text-xs text-text-muted">
-            LAT {center.latitude.toFixed(4)}° N · LNG{" "}
-            {center.longitude.toFixed(4)}° E
+            LAT {center.latitude}° N · LNG {center.longitude}° E
           </p>
         </Field>
 
-        {center.settlement ? (
+        {center.bankAccount ? (
           <div className="bg-teal-50/60 rounded-xl px-4 py-3">
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-teal-900 mb-2">
               <Banknote size={12} />
               Bank Settlement Details
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-              <Detail label="Holder Name" value={center.settlement.accountHolderName} />
-              <Detail label="IFSC Code" value={center.settlement.ifscCode} />
+              <Detail
+                label="Holder Name"
+                value={center.bankAccount.accountHolderName}
+              />
+              <Detail label="IFSC Code" value={center.bankAccount.ifscCode} />
               <Detail
                 label="Account Number"
-                value={center.settlement.accountNumberMasked}
+                value={center.bankAccount.accountNumber}
                 className="col-span-2"
               />
             </div>

@@ -8,18 +8,16 @@ export type ServiceTierKey =
   | "PRESIDENTIAL_LUXE";
 
 export type CenterDraftPayload = {
-  centerName: string;
+  name: string;
   phone: string;
   address: string;
   latitude?: number;
   longitude?: number;
   images?: string[];
   serviceTiers?: ServiceTierKey[];
-  settlement?: {
-    accountHolderName: string;
-    accountNumber: string;
-    ifscCode: string;
-  };
+  accountHolderName: string;
+  accountNumber: string;
+  ifscCode: string;
   tier?: CenterTier;
 };
 
@@ -31,7 +29,6 @@ export async function createCenter(
 ): Promise<Center> {
   const res = await apiClient.post<ApiSuccess<Center>>("/admin/centers", {
     ...payload,
-    saveMode: mode,
   });
   return res.data.data;
 }

@@ -4,10 +4,12 @@ import { Bell, Search, LogOut } from "lucide-react";
 import { Avatar } from "@/shared/ui/Avatar";
 import { Input } from "@/shared/ui/Input";
 import { useAuth } from "@/features/auth";
+import { useCenter } from "@/features/centers";
+import { useCentersFilters } from "@/features/centers/state/centers.store";
 
 export function TopBar() {
   const { user, logout } = useAuth();
-
+  const {   setSearch } = useCentersFilters();
   return (
     <header className="h-16 bg-white border-b border-border px-6 flex items-center gap-6">
       <div className="flex-1">
@@ -16,6 +18,7 @@ export function TopBar() {
           placeholder="Search centers, cities, or IDs…"
           leadingIcon={<Search size={18} />}
           className="h-11 py-0"
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 

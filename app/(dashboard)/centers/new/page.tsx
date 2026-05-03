@@ -4,7 +4,7 @@ import { CreateCenterForm } from "@/features/centers/ui/CreateCenterForm";
 
 export default function CreateCenterPage() {
   return (
-    <div className="flex flex-col gap-8 max-w-5xl">
+    <div className="flex flex-col gap-8 max-w-5xl min-h-screen">
       <header className="flex flex-col gap-3">
         <nav className="flex items-center gap-1 text-sm text-text-muted">
           <Link href="/centers" className="hover:text-navy-900">

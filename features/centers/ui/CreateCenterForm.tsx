@@ -13,17 +13,16 @@ import { useCreateCenter } from "../hooks/useCreateCenter";
 import { useCreateCenterStore } from "../state/createCenter.store";
 
 const schema = z.object({
-  centerName: z.string().min(2, "Required"),
+  name: z.string().min(2, "Required"),
   phone: z.string().min(8, "Required"),
   address: z.string().min(5, "Required"),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  accountHolderName: z.string().optional(),
-  accountNumber: z.string().optional(),
+  accountHolderName: z.string().min(3, "Required"),
+  accountNumber: z.string().min(12, "Required"),
   ifscCode: z
     .string()
     .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC")
-    .optional()
     .or(z.literal("")),
 });
 type FormValues = z.infer<typeof schema>;
@@ -31,14 +30,14 @@ type FormValues = z.infer<typeof schema>;
 export function CreateCenterForm() {
   const { register, handleSubmit, formState } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { centerName: "", phone: "", address: "" },
+    defaultValues: { name: "", phone: "", address: "" },
   });
   const create = useCreateCenter();
   const { imageUrls, selectedTiers } = useCreateCenterStore();
 
   function buildPayload(values: FormValues) {
     return {
-      centerName: values.centerName,
+      name: values.name,
       phone: values.phone,
       address: values.address,
       latitude: values.latitude,
@@ -47,14 +46,9 @@ export function CreateCenterForm() {
         (u): u is string => typeof u === "string",
       ),
       serviceTiers: selectedTiers,
-      settlement:
-        values.accountHolderName && values.accountNumber && values.ifscCode
-          ? {
-              accountHolderName: values.accountHolderName,
-              accountNumber: values.accountNumber,
-              ifscCode: values.ifscCode,
-            }
-          : undefined,
+      accountHolderName: values.accountHolderName,
+      accountNumber: values.accountNumber,
+      ifscCode: values.ifscCode,
     };
   }
 
@@ -72,10 +66,10 @@ export function CreateCenterForm() {
         description="Core branding and contact infrastructure for the new wash center."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Center Name" error={formState.errors.centerName?.message}>
+          <Field label="Center Name" error={formState.errors.name?.message}>
             <Input
               placeholder="e.g. Azure Luxe Downtown"
-              {...register("centerName")}
+              {...register("name")}
             />
           </Field>
           <Field label="Mobile Number" error={formState.errors.phone?.message}>
