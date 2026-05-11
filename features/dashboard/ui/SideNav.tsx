@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Wallet, Settings, ListChecks } from "lucide-react";
+import { Building2, Wallet, Settings, ListChecks, Info } from "lucide-react";
 import { Avatar } from "@/shared/ui/Avatar";
 import { useAuth } from "@/features/auth";
 import { cn } from "@/shared/lib/cn";
@@ -14,6 +14,7 @@ const NAV: Item[] = [
   { href: "/payouts", label: "Payouts", icon: <Wallet size={18} /> },
   { href: "/jobs", label: "Job History", icon: <ListChecks size={18} /> },
   { href: "/settings", label: "Settings", icon: <Settings size={18} /> },
+  { href: "/privacy", label: "Privacy Policy", icon: < Info size={18} /> },
 ];
 
 export function SideNav() {
