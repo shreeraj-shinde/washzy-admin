@@ -35,7 +35,7 @@ export async function createCenter(
 
 export async function uploadCenterImage(file: File): Promise<string> {
   const form = new FormData();
-  form.append("file", file);
+  form.append("image", file);
   const res = await apiClient.post<ApiSuccess<{ url: string }>>(
     "/admin/centers/upload-image",
     form,
