@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCentersList } from "../hooks/useCenters";
 import { CenterCard } from "./CenterCard";
 import { OnboardCenterCard } from "./OnboardCenterCard";
@@ -38,7 +39,14 @@ export function CentersGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {centers.map((c) => (
-        <CenterCard key={c.id} center={c} />
+        <Link
+          key={c.id}
+          href={`/centers/${c.id}`}
+          aria-label={`Open ${c.name}`}
+          className="rounded-card outline-none transition-transform hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-accent-500"
+        >
+          <CenterCard center={c} />
+        </Link>
       ))}
       <OnboardCenterCard />
     </div>

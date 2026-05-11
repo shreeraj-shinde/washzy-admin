@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,28 +13,65 @@ import { ServiceTierGrid } from "./ServiceTierCard";
 import { useCreateCenter } from "../hooks/useCreateCenter";
 import { useCreateCenterStore } from "../state/createCenter.store";
 
+const TIER_KEYS = ["STANDARD_WASH", "PREMIUM_DETAIL", "PRESIDENTIAL_LUXE"] as const;
+
 const schema = z.object({
   name: z.string().min(2, "Required"),
   phone: z.string().min(8, "Required"),
   address: z.string().min(5, "Required"),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  latitude: z
+    .number()
+    .min(-90, "Latitude must be between -90 and 90")
+    .max(90, "Latitude must be between -90 and 90"),
+  
+  longitude: z
+    .number()
+    .min(-180, "Longitude must be between -180 and 180")
+    .max(180, "Longitude must be between -180 and 180"),
+    
   accountHolderName: z.string().min(3, "Required"),
   accountNumber: z.string().min(12, "Required"),
   ifscCode: z
     .string()
     .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC")
     .or(z.literal("")),
+  images: z
+    .array(z.url())
+    .min(1, "Upload at least one facility image"),
+  serviceTiers: z
+    .array(z.enum(TIER_KEYS))
+    .min(1, "Select at least one service tier"),
 });
 type FormValues = z.infer<typeof schema>;
 
 export function CreateCenterForm() {
-  const { register, handleSubmit, formState } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, formState } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", phone: "", address: "" },
+    defaultValues: {
+      name: "",
+      phone: "",
+      address: "",
+      images: [],
+      serviceTiers: [],
+    },
   });
   const create = useCreateCenter();
   const { imageUrls, selectedTiers } = useCreateCenterStore();
+
+  useEffect(() => {
+    const images = Object.values(imageUrls).filter(
+      (u): u is string => typeof u === "string",
+    );
+    setValue("images", images, {
+      shouldValidate: formState.isSubmitted,
+    });
+  }, [imageUrls, setValue, formState.isSubmitted]);
+
+  useEffect(() => {
+    setValue("serviceTiers", selectedTiers, {
+      shouldValidate: formState.isSubmitted,
+    });
+  }, [selectedTiers, setValue, formState.isSubmitted]);
 
   function buildPayload(values: FormValues) {
     return {
@@ -42,10 +80,8 @@ export function CreateCenterForm() {
       address: values.address,
       latitude: values.latitude,
       longitude: values.longitude,
-      images: Object.values(imageUrls).filter(
-        (u): u is string => typeof u === "string",
-      ),
-      serviceTiers: selectedTiers,
+      images: values.images,
+      serviceTiers: values.serviceTiers,
       accountHolderName: values.accountHolderName,
       accountNumber: values.accountNumber,
       ifscCode: values.ifscCode,
@@ -95,20 +131,26 @@ export function CreateCenterForm() {
       >
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Latitude">
+            <Field label="Latitude" error={formState.errors.latitude?.message}>
               <Input
                 type="number"
                 step="any"
                 placeholder="40.7128"
-                {...register("latitude", { valueAsNumber: true })}
+                {...register("latitude", {
+                  setValueAs: (v) =>
+                    v === "" || v === null || v === undefined ? undefined : Number(v),
+                })}
               />
             </Field>
-            <Field label="Longitude">
+            <Field label="Longitude" error={formState.errors.longitude?.message}>
               <Input
                 type="number"
                 step="any"
                 placeholder="-74.0060"
-                {...register("longitude", { valueAsNumber: true })}
+                {...register("longitude", {
+                  setValueAs: (v) =>
+                    v === "" || v === null || v === undefined ? undefined : Number(v),
+                })}
               />
             </Field>
           </div>
@@ -119,6 +161,11 @@ export function CreateCenterForm() {
               <ImageSlot slot="detailing" label="Detailing Area" />
               <ImageSlot slot="interior" label="Interior Bay" />
             </div>
+            {formState.errors.images ? (
+              <p className="text-xs text-danger px-2 mt-2">
+                {formState.errors.images.message}
+              </p>
+            ) : null}
           </div>
         </div>
       </FormSection>
@@ -133,18 +180,23 @@ export function CreateCenterForm() {
             <div className="mt-3">
               <ServiceTierGrid />
             </div>
+            {formState.errors.serviceTiers ? (
+              <p className="text-xs text-danger px-2 mt-2">
+                {formState.errors.serviceTiers.message}
+              </p>
+            ) : null}
           </div>
 
           <div>
             <FormFieldLabel>Settlement Account</FormFieldLabel>
             <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Account Holder Name">
+              <Field label="Account Holder Name" error={formState.errors.accountHolderName?.message}>
                 <Input
                   placeholder="Azure Luxe Operations LLC"
                   {...register("accountHolderName")}
                 />
               </Field>
-              <Field label="Account Number">
+              <Field label="Account Number" error={formState.errors.accountNumber?.message}>
                 <Input
                   placeholder="**** **** 4492"
                   {...register("accountNumber")}

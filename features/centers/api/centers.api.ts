@@ -22,3 +22,10 @@ export async function getCenter(id: string): Promise<Center> {
 
   return res.data.data;
 }
+
+export async function activateCenter(id: string): Promise<Center> {
+  const res = await apiClient.patch<ApiSuccess<Center>>(
+    `/admin/centers/${id}/activate`,
+  );
+  return res.data.data;
+}

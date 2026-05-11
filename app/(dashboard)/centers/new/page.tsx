@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { CreateCenterForm } from "@/features/centers/ui/CreateCenterForm";
 
+export const dynamic = 'force-dynamic';
+
 export default function CreateCenterPage() {
   return (
     <div className="flex flex-col gap-8 max-w-5xl min-h-screen">
