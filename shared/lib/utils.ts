@@ -1,3 +1,5 @@
+import { v7 as uuidv7 } from "uuid";
+
 export function generateUID(): string {
-  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  return uuidv7();
 }

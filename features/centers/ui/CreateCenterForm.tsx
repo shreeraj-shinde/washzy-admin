@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/shared/ui/Input";
-import { Textarea } from "@/shared/ui/Textarea";
 import { Button } from "@/shared/ui/Button";
 import { FormSection, FormFieldLabel } from "./FormSection";
 import { ImageSlot } from "./ImageSlot";
 import { ServiceTierGrid } from "./ServiceTierCard";
+import { AddressAutocomplete } from "./AddressAutocomplete";
 import { useCreateCenter } from "../hooks/useCreateCenter";
 import { useCreateCenterStore } from "../state/createCenter.store";
 
@@ -45,7 +45,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function CreateCenterForm() {
-  const { register, handleSubmit, setValue, formState } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, control, formState } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
@@ -116,10 +116,22 @@ export function CreateCenterForm() {
             error={formState.errors.address?.message}
             className="md:col-span-2"
           >
-            <Textarea
-              rows={3}
-              placeholder="Street, Building, Area, Postal Code"
-              {...register("address")}
+            <Controller
+              control={control}
+              name="address"
+              render={({ field }) => (
+                <AddressAutocomplete
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  onSelect={({ address, latitude, longitude }) => {
+                    setValue("address", address, { shouldValidate: true });
+                    setValue("latitude", latitude, { shouldValidate: true });
+                    setValue("longitude", longitude, { shouldValidate: true });
+                  }}
+                  invalid={!!formState.errors.address}
+                  placeholder="Start typing address — pick a suggestion to auto-fill lat/lon"
+                />
+              )}
             />
           </Field>
         </div>
