@@ -1,6 +1,7 @@
 import { Badge } from "@/shared/ui/Badge";
 import { TierBadge } from "../StatusBadge";
 import { CenterActivateButton } from "./CenterActivateButton";
+import { CenterDeleteButton } from "./CenterDeleteButton";
 import type { Center, CenterStatus } from "../../api/centers.types";
 
 const STATUS_TONE: Record<CenterStatus, Parameters<typeof Badge>[0]["tone"]> = {
@@ -26,11 +27,16 @@ export function CenterDetailHeader({ center }: Props) {
         </p>
       </div>
 
-      <CenterActivateButton
-        centerId={center.id}
-        status={center.status}
-        hasBankAccount={Boolean(center.bankAccount)}
-      />
+      <div className="flex flex-col items-end gap-3">
+        <CenterActivateButton
+          centerId={center.id}
+          status={center.status}
+          hasBankAccount={Boolean(center.bankAccount)}
+        />
+        {center.status === "INACTIVE" ? (
+          <CenterDeleteButton centerId={center.id} centerName={center.name} />
+        ) : null}
+      </div>
     </div>
   );
 }

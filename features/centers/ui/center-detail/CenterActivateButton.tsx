@@ -5,6 +5,7 @@ import { Button } from "@/shared/ui/Button";
 import { toApiError } from "@/shared/lib/apiClient";
 import { useActivateCenter } from "../../hooks/useActivateCenter";
 import type { CenterStatus } from "../../api/centers.types";
+import { useDeactivateCenters } from "../../hooks/useDecactivateCenters";
 
 type Props = {
   centerId: string;
@@ -14,15 +15,24 @@ type Props = {
 
 export function CenterActivateButton({ centerId, status, hasBankAccount }: Props) {
   const activate = useActivateCenter(centerId);
+  const deactivate = useDeactivateCenters(centerId)
 
   const isActive = status === "ACTIVE";
-  const disabled = isActive || !hasBankAccount || activate.isPending;
+  const disabled =  !hasBankAccount || activate.isPending || deactivate.isPending;
+  
 
-  const label = isActive
-    ? "Activated"
-    : activate.isPending
-      ? "Activating…"
-      : "Activate Center";
+  const label = deactivate.isPending ? "Deactivating" : activate.isPending ? "Activating" : isActive ? "Deactivate" : "Activate"
+
+  
+
+    const handleClickActivate = () => {
+      if (isActive) {
+        deactivate.mutate()
+        return
+      }
+      activate.mutate()
+      return
+    }
 
   return (
     <div className="flex flex-col items-end gap-2">
@@ -30,7 +40,7 @@ export function CenterActivateButton({ centerId, status, hasBankAccount }: Props
         variant="accent"
         size="md"
         disabled={disabled}
-        onClick={() => activate.mutate()}
+        onClick={handleClickActivate}
       >
         {label}
       </Button>
@@ -46,7 +56,7 @@ export function CenterActivateButton({ centerId, status, hasBankAccount }: Props
           <AlertCircle size={12} />
           {toApiError(activate.error).message}
         </p>
-      ) : activate.isSuccess ? (
+      ) : activate.isSuccess && isActive ? (
         <p className="text-xs text-accent-300 flex items-center gap-1">
           <CheckCircle2 size={12} />
           Center activated

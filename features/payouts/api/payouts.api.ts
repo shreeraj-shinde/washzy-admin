@@ -9,6 +9,7 @@ export async function listPayouts(): Promise<Paginated<Payout>> {
 }
 
 export async function sendPayout(payload: SendPayoutPayload): Promise<Payout> {
+  console.log("[INITIATE PAYOUT PAYLOAD ADMIN]", payload);
   const res = await apiClient.post<ApiSuccess<Payout>>(
     "/admin/payouts",
     payload,
