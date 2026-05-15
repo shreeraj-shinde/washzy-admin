@@ -6,10 +6,7 @@ type Props = HTMLAttributes<HTMLDivElement>;
 export function Card({ className, ...rest }: Props) {
   return (
     <div
-      className={cn(
-        "rounded-card bg-white shadow-card overflow-hidden",
-        className,
-      )}
+      className={cn("rounded-card bg-white shadow-card", className)}
       {...rest}
     />
   );
