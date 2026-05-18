@@ -1,6 +1,7 @@
 import axios, { AxiosError, type AxiosInstance } from "axios";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 import { env } from "./env";
+import { error } from "console";
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: env.apiBaseUrl,
@@ -18,6 +19,17 @@ apiClient.interceptors.request.use(async (config) => {
   return config;
 });
 
+// Handle Login
+apiClient.interceptors.response.use(
+  (r) => r,
+  async (err: AxiosError) => {
+    if (err.response?.status === 401 && typeof window !== undefined) {
+      await signOut({ callbackUrl: "/login" });
+    }
+    return Promise.reject(err);
+  },
+);
+
 export type ApiError = {
   code: string;
   message: string;
@@ -34,5 +46,8 @@ export function toApiError(err: unknown): ApiError {
       }
     );
   }
-  return { code: "UNKNOWN", message: (err as Error)?.message ?? "Unknown error" };
+  return {
+    code: "UNKNOWN",
+    message: (err as Error)?.message ?? "Unknown error",
+  };
 }

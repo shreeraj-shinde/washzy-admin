@@ -6,16 +6,40 @@ import { Button } from "@/shared/ui/Button";
 import { usePayouts } from "../hooks/usePayouts";
 import { PayoutStatusBadge } from "./PayoutStatusBadge";
 import type { Payout } from "../api/payouts.types";
+import { downloadCsv, type CsvColumn } from "@/shared/lib/exportCsv";
+
+const PAYOUT_CSV_COLUMNS: CsvColumn<Payout>[] = [
+  { header: "Txn Number", value: (p) => p.txnNumber },
+  { header: "Payout ID", value: (p) => p.id },
+  { header: "Center", value: (p) => p.center?.name ?? "" },
+  { header: "Amount (INR)", value: (p) => p.amount },
+  { header: "Status", value: (p) => p.status },
+  { header: "Remarks", value: (p) => p.remarks ?? "" },
+  { header: "Idempotency Key", value: (p) => p.idempotencyKey },
+  { header: "Created At", value: (p) => new Date(p.createdAt).toISOString() },
+];
 
 export function PayoutHistoryList() {
   const { data, isLoading, isError } = usePayouts();
+  const payouts = data?.items ?? [];
+
+  const handleExportCsv = () => {
+    if (payouts.length === 0) return;
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadCsv(`payouts-${stamp}.csv`, payouts, PAYOUT_CSV_COLUMNS);
+  };
 
   return (
     <Card className="p-6 flex flex-col gap-4">
       <header className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-navy-900">Payout History</h2>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="ghost">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleExportCsv}
+            disabled={isLoading || isError || payouts.length === 0}
+          >
             <Download size={14} /> Export CSV
           </Button>
           <button
@@ -38,9 +62,7 @@ export function PayoutHistoryList() {
             ))
           : isError
             ? null
-            : (data?.items ?? []).map((p) => (
-                <PayoutRow key={p.id} payout={p} />
-              ))}
+            : payouts.map((p) => <PayoutRow key={p.id} payout={p} />)}
       </ul>
 
       <button
