@@ -18,11 +18,20 @@ export async function submitDeletionRequest(values: DeleteAccountFormValues): Pr
     return { ok: false, message: "Server misconfiguration" };
   }
 
+  const internalKey = process.env.INTERNAL_API_SECRET;
+  if (!internalKey) {
+    console.error("[delete-account] INTERNAL_API_SECRET is not set");
+    return { ok: false, message: "Server misconfiguration" };
+  }
+
   let upstream: Response;
   try {
     upstream = await fetch(`${backendUrl}/deletion-requests`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-internal-api-key": internalKey,
+      },
       body: JSON.stringify(parsed.data),
     });
   } catch (err) {
