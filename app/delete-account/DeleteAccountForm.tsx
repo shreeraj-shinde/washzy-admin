@@ -8,6 +8,7 @@ import { Label } from "@/shared/ui/Label";
 import { Textarea } from "@/shared/ui/Textarea";
 import { Button } from "@/shared/ui/Button";
 import { deleteAccountSchema, type DeleteAccountFormValues } from "./schema";
+import { submitDeletionRequest } from "./actions";
 
 type Status = "idle" | "loading" | "success" | { kind: "error"; message: string };
 
@@ -25,27 +26,12 @@ export function DeleteAccountForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     setStatus("loading");
-    try {
-      const res = await fetch("/api/delete-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      if (res.ok) {
-        setStatus("success");
-        reset();
-        return;
-      }
-      const data = await res.json().catch(() => ({})) as { error?: string };
-      setStatus({
-        kind: "error",
-        message: data.error ?? "Something went wrong. Please try again.",
-      });
-    } catch {
-      setStatus({
-        kind: "error",
-        message: "Unable to reach the server. Please try again later.",
-      });
+    const result = await submitDeletionRequest(values);
+    if (result.ok) {
+      setStatus("success");
+      reset();
+    } else {
+      setStatus({ kind: "error", message: result.message });
     }
   });
 
