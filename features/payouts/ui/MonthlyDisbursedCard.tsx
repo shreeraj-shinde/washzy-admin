@@ -5,8 +5,8 @@ import { usePayoutSummary } from "../hooks/usePayouts";
 
 export function MonthlyDisbursedCard() {
   const { data } = usePayoutSummary();
-  const total = data?.totalThisMonthInr ?? 0;
-  const change = data?.changePctVsLastMonth ?? 0;
+  const total = data?.totalDisbursedThisMonth ?? 0;
+  const change = data?.percentChangeVsLastMonth ?? 0;
 
   return (
     <div className="rounded-card bg-navy-900 text-white px-6 py-5 flex flex-col gap-2 shadow-card">
