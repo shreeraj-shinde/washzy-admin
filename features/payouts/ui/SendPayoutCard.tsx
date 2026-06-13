@@ -13,6 +13,7 @@ import { useCentersList } from "@/features/centers";
 import { useSendPayout, useCenterWallet } from "../hooks/usePayouts";
 import { useState } from "react";
 import { generateUID } from "@/shared/lib/utils";
+import { toApiError } from "@/shared/lib/apiClient";
 
 const schema = z.object({
   centerId: z.string().min(1, "Select a center"),
@@ -35,10 +36,14 @@ export function SendPayoutCard() {
   const [idempotencyKey, setIdempotencyKey] = useState(() => generateUID());
 
   const submit = handleSubmit(async (values) => {
-    await send.mutateAsync({ ...values, idempotencyKey });
-    reset();
-    setSelectedCenterId(null);
-    setIdempotencyKey(generateUID());
+    try {
+      await send.mutateAsync({ ...values, idempotencyKey });
+      reset();
+      setSelectedCenterId(null);
+      setIdempotencyKey(generateUID());
+    } catch {
+      // error displayed via send.error below
+    }
   });
 
   const pendingBalance = walletData?.wallet.pendingBalance ?? 0;
@@ -121,6 +126,12 @@ export function SendPayoutCard() {
             {...register("remarks")}
           />
         </Field>
+
+        {send.error && (
+          <p className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            {toApiError(send.error).message}
+          </p>
+        )}
 
         <Button
           type="submit"

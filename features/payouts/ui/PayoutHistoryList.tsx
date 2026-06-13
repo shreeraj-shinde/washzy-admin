@@ -9,6 +9,7 @@ import { usePayouts, useSettlePayout, useFailPayout } from "../hooks/usePayouts"
 import { PayoutStatusBadge } from "./PayoutStatusBadge";
 import type { Payout } from "../api/payouts.types";
 import { downloadCsv, type CsvColumn } from "@/shared/lib/exportCsv";
+import { toApiError } from "@/shared/lib/apiClient";
 
 const PAYOUT_CSV_COLUMNS: CsvColumn<Payout>[] = [
   { header: "Txn Number",     value: (p) => p.txnNumber },
@@ -66,16 +67,20 @@ function PayoutRow({ payout }: { payout: Payout }) {
   const [reason, setReason]           = useState("");
 
   const handleSettle = async () => {
-    await settle.mutateAsync({ id: payout.id, referenceNumber: ref.trim() || undefined });
-    setSettleModal(false);
-    setRef("");
+    try {
+      await settle.mutateAsync({ id: payout.id, referenceNumber: ref.trim() || undefined });
+      setSettleModal(false);
+      setRef("");
+    } catch { /* error shown in modal via settle.error */ }
   };
 
   const handleFail = async () => {
     if (!reason.trim()) return;
-    await fail.mutateAsync({ id: payout.id, failureReason: reason.trim() });
-    setFailModal(false);
-    setReason("");
+    try {
+      await fail.mutateAsync({ id: payout.id, failureReason: reason.trim() });
+      setFailModal(false);
+      setReason("");
+    } catch { /* error shown in modal via fail.error */ }
   };
 
   return (
@@ -137,6 +142,11 @@ function PayoutRow({ payout }: { payout: Payout }) {
             value={ref}
             onChange={(e) => setRef(e.target.value)}
           />
+          {settle.error && (
+            <p className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+              {toApiError(settle.error).message}
+            </p>
+          )}
           <div className="flex gap-3 mt-2">
             <Button variant="outline" size="sm" className="flex-1" onClick={() => setSettleModal(false)}>
               Cancel
@@ -160,6 +170,11 @@ function PayoutRow({ payout }: { payout: Payout }) {
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
+          {fail.error && (
+            <p className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+              {toApiError(fail.error).message}
+            </p>
+          )}
           <div className="flex gap-3 mt-2">
             <Button variant="outline" size="sm" className="flex-1" onClick={() => setFailModal(false)}>
               Cancel
