@@ -10,6 +10,7 @@ import { CenterInfoGrid } from "./center-detail/CenterInfoGrid";
 import { CenterBankCard } from "./center-detail/CenterBankCard";
 import { CenterPhotosGallery } from "./center-detail/CenterPhotosGallery";
 import { CenterDetailSkeleton } from "./center-detail/CenterDetailSkeleton";
+import { CenterEarningsCard } from "./center-detail/CenterEarningsCard";
 
 type Props = { id: string };
 
@@ -43,6 +44,8 @@ export function CenterDetail({ id }: Props) {
       </Card>
 
       <CenterPhotosGallery images={center.images ?? []} />
+
+      <CenterEarningsCard centerId={center.id} />
     </div>
   );
 }
