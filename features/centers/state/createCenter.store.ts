@@ -1,15 +1,15 @@
 "use client";
 
 import { create } from "zustand";
-import type { ServiceTierKey } from "../api/createCenter";
 
 type ImageSlot = "main" | "detailing" | "interior";
 
 type CreateState = {
   imageUrls: Record<ImageSlot, string | null>;
-  selectedTiers: ServiceTierKey[];
+  /** Catalog service ids (GET /services) selected for this center */
+  selectedServiceIds: string[];
   setImage: (slot: ImageSlot, url: string | null) => void;
-  toggleTier: (tier: ServiceTierKey) => void;
+  toggleService: (id: string) => void;
   reset: () => void;
 };
 
@@ -21,16 +21,16 @@ const initialImages: Record<ImageSlot, string | null> = {
 
 export const useCreateCenterStore = create<CreateState>((set) => ({
   imageUrls: initialImages,
-  selectedTiers: [],
+  selectedServiceIds: [],
   setImage: (slot, url) =>
     set((s) => ({ imageUrls: { ...s.imageUrls, [slot]: url } })),
-  toggleTier: (tier) =>
+  toggleService: (id) =>
     set((s) => ({
-      selectedTiers: s.selectedTiers.includes(tier)
-        ? s.selectedTiers.filter((t) => t !== tier)
-        : [...s.selectedTiers, tier],
+      selectedServiceIds: s.selectedServiceIds.includes(id)
+        ? s.selectedServiceIds.filter((x) => x !== id)
+        : [...s.selectedServiceIds, id],
     })),
-  reset: () => set({ imageUrls: initialImages, selectedTiers: [] }),
+  reset: () => set({ imageUrls: initialImages, selectedServiceIds: [] }),
 }));
 
 export type { ImageSlot };

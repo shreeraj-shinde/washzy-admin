@@ -1,14 +1,7 @@
 import { MapPin, Phone } from "lucide-react";
-import { Badge } from "@/shared/ui/Badge";
 import { OtpVerifiedBadge } from "../OtpVerifiedBadge";
 import { Field } from "./Field";
 import type { Center } from "../../api/centers.types";
-
-const SERVICE_TIER_LABEL: Record<string, string> = {
-  STANDARD_WASH: "Standard Wash",
-  PREMIUM_DETAIL: "Premium Detail",
-  PRESIDENTIAL_LUXE: "Presidential Luxe",
-};
 
 const FORMAT_FULL: Intl.DateTimeFormatOptions = {
   day: "numeric",
@@ -43,20 +36,6 @@ export function CenterInfoGrid({ center }: Props) {
         <p className="mt-1 text-xs text-text-muted">
           LAT {String(center.latitude)}° N · LNG {String(center.longitude)}° E
         </p>
-      </Field>
-
-      <Field label="Service Tiers">
-        <div className="flex flex-wrap gap-2">
-          {center.serviceTiers?.length ? (
-            center.serviceTiers.map((t) => (
-              <Badge key={String(t)} tone="teal">
-                {SERVICE_TIER_LABEL[String(t)] ?? String(t)}
-              </Badge>
-            ))
-          ) : (
-            <span className="text-xs text-text-muted">None configured</span>
-          )}
-        </div>
       </Field>
 
       <Field label="Created / Updated">

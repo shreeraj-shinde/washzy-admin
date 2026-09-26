@@ -9,49 +9,52 @@ import { Input } from "@/shared/ui/Input";
 import { Button } from "@/shared/ui/Button";
 import { FormSection, FormFieldLabel } from "./FormSection";
 import { ImageSlot } from "./ImageSlot";
-import { ServiceTierGrid } from "./ServiceTierCard";
+import { ServiceCatalogPicker } from "./ServiceChecklist";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { useCreateCenter } from "../hooks/useCreateCenter";
 import { useCreateCenterStore } from "../state/createCenter.store";
 import { toApiError } from "@/shared/lib/apiClient";
 
-const TIER_KEYS = [
-  "STANDARD_WASH",
-  "PREMIUM_DETAIL",
-  "PRESIDENTIAL_LUXE",
-] as const;
-
-const schema = z.object({
-  name: z.string().min(2, "Center name must be at least 2 characters"),
-  phone: z
-    .string()
-    .min(10, "Enter a valid mobile number (e.g. +91 98765 43210)")
-    .max(15, "Enter a valid mobile number (e.g. +91 98765 43210)"),
-  address: z.string().min(5, "Enter a complete address"),
-  latitude: z
-    .number()
-    .min(-90, "Latitude must be between −90 and 90")
-    .max(90, "Latitude must be between −90 and 90"),
-  longitude: z
-    .number()
-    .min(-180, "Longitude must be between −180 and 180")
-    .max(180, "Longitude must be between −180 and 180"),
-  accountHolderName: z
-    .string()
-    .min(3, "Enter the account holder's full name"),
-  accountNumber: z
-    .string()
-    .min(9, "Account number must be 9–18 digits")
-    .max(18, "Account number must be 9–18 digits"),
-  ifscCode: z
-    .string()
-    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code — format: HDFC0001234")
-    .or(z.literal("")),
-  images: z.array(z.url()).min(1, "Upload at least one facility image"),
-  serviceTiers: z
-    .array(z.enum(TIER_KEYS))
-    .min(1, "Select at least one service tier"),
-});
+const schema = z
+  .object({
+    // "submit" = Initialize Onboarding, "draft" = Save Draft. Set just before validation.
+    intent: z.enum(["draft", "submit"]),
+    name: z.string().min(2, "Center name must be at least 2 characters"),
+    phone: z
+      .string()
+      .min(10, "Enter a valid mobile number (e.g. +91 98765 43210)")
+      .max(15, "Enter a valid mobile number (e.g. +91 98765 43210)"),
+    address: z.string().min(5, "Enter a complete address"),
+    latitude: z
+      .number()
+      .min(-90, "Latitude must be between −90 and 90")
+      .max(90, "Latitude must be between −90 and 90"),
+    longitude: z
+      .number()
+      .min(-180, "Longitude must be between −180 and 180")
+      .max(180, "Longitude must be between −180 and 180"),
+    accountHolderName: z
+      .string()
+      .min(3, "Enter the account holder's full name"),
+    accountNumber: z
+      .string()
+      .min(9, "Account number must be 9–18 digits")
+      .max(18, "Account number must be 9–18 digits"),
+    ifscCode: z
+      .string()
+      .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code — format: HDFC0001234")
+      .or(z.literal("")),
+    images: z.array(z.url()).min(1, "Upload at least one facility image"),
+    serviceIds: z.array(z.string()),
+  })
+  // Matches the backend: a draft may have no services, onboarding needs at
+  // least one. `when` makes this run even while other fields are invalid.
+  .refine((v) => v.intent !== "submit" || v.serviceIds.length > 0, {
+    path: ["serviceIds"],
+    message: "Select at least one service",
+    when: (payload) =>
+      Array.isArray((payload.value as { serviceIds?: unknown })?.serviceIds),
+  });
 type FormValues = z.infer<typeof schema>;
 
 export function CreateCenterForm() {
@@ -63,11 +66,13 @@ export function CreateCenterForm() {
         phone: "",
         address: "",
         images: [],
-        serviceTiers: [],
+        serviceIds: [],
+        intent: "submit",
       },
     });
   const create = useCreateCenter();
-  const { imageUrls, selectedTiers } = useCreateCenterStore();
+  const { imageUrls, selectedServiceIds, toggleService } =
+    useCreateCenterStore();
 
   useEffect(() => {
     const images = Object.values(imageUrls).filter(
@@ -79,10 +84,10 @@ export function CreateCenterForm() {
   }, [imageUrls, setValue, formState.isSubmitted]);
 
   useEffect(() => {
-    setValue("serviceTiers", selectedTiers, {
+    setValue("serviceIds", selectedServiceIds, {
       shouldValidate: formState.isSubmitted,
     });
-  }, [selectedTiers, setValue, formState.isSubmitted]);
+  }, [selectedServiceIds, setValue, formState.isSubmitted]);
 
   // Maps API field names (backend) to form field names (frontend)
   const applyApiFieldErrors = useCallback(
@@ -99,7 +104,7 @@ export function CreateCenterForm() {
         accountNumber: "accountNumber",
         ifscCode: "ifscCode",
         images: "images",
-        serviceTiers: "serviceTiers",
+        serviceIds: "serviceIds",
       };
 
       if (Array.isArray(details)) {
@@ -142,19 +147,27 @@ export function CreateCenterForm() {
       latitude: values.latitude,
       longitude: values.longitude,
       images: values.images,
-      serviceTiers: values.serviceTiers,
+      serviceIds: values.serviceIds,
       accountHolderName: values.accountHolderName,
       accountNumber: values.accountNumber,
       ifscCode: values.ifscCode,
     };
   }
 
-  const submit = handleSubmit((v) =>
+  const submitForm = handleSubmit((v) =>
     create.mutate({ payload: buildPayload(v), mode: "submit" }),
   );
-  const draft = handleSubmit((v) =>
+  const draftForm = handleSubmit((v) =>
     create.mutate({ payload: buildPayload(v), mode: "draft" }),
   );
+  const submit = (e?: React.BaseSyntheticEvent) => {
+    setValue("intent", "submit");
+    return submitForm(e);
+  };
+  const draft = (e?: React.BaseSyntheticEvent) => {
+    setValue("intent", "draft");
+    return draftForm(e);
+  };
 
   const errors = formState.errors;
 
@@ -174,7 +187,7 @@ export function CreateCenterForm() {
           </Field>
           <Field label="Mobile Number" error={errors.phone?.message}>
             <Input
-              placeholder="+91 98765 43210"
+              placeholder="+913333333333"
               invalid={!!errors.phone}
               {...register("phone")}
             />
@@ -258,14 +271,21 @@ export function CreateCenterForm() {
       >
         <div className="flex flex-col gap-6">
           <div>
-            <FormFieldLabel>Service Tiers</FormFieldLabel>
+            <FormFieldLabel>Services Offered</FormFieldLabel>
+            <p className="text-xs text-text-muted px-1 mt-1">
+              Every service is a 30-minute slot. Select at least one to onboard the center.
+            </p>
             <div
-              className={`mt-3 rounded-2xl transition-shadow ${errors.serviceTiers ? "ring-2 ring-danger" : ""}`}
+              className={`mt-3 rounded-2xl transition-shadow ${errors.serviceIds ? "ring-2 ring-danger" : ""}`}
             >
-              <ServiceTierGrid />
+              <ServiceCatalogPicker
+                selectedIds={selectedServiceIds}
+                onToggle={toggleService}
+                disabled={create.isPending}
+              />
             </div>
-            {errors.serviceTiers ? (
-              <p className="text-xs text-danger px-1 mt-2">{errors.serviceTiers.message}</p>
+            {errors.serviceIds ? (
+              <p className="text-xs text-danger px-1 mt-2">{errors.serviceIds.message}</p>
             ) : null}
           </div>
 

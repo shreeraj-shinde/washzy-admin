@@ -48,3 +48,15 @@ export async function deleteCenter(id : string) {
   const res = await apiClient.delete(`/admin/centers/${id}`)
   return res.data
 }
+
+// Update Center Services - Replaces the whole set of services the center offers
+export async function updateCenterServices(
+  id: string,
+  serviceIds: string[],
+): Promise<Center> {
+  const res = await apiClient.patch<ApiSuccess<Center>>(
+    `/admin/centers/${id}`,
+    { serviceIds },
+  );
+  return res.data.data;
+}
