@@ -7,12 +7,6 @@ import type { CenterTransaction } from "@/features/payouts";
 
 type Props = { centerId: string };
 
-const SERVICE_TIER_LABEL: Record<string, string> = {
-  STANDARD_WASH:      "Standard Wash",
-  PREMIUM_DETAIL:     "Premium Detail",
-  PRESIDENTIAL_LUXE:  "Presidential Luxe",
-};
-
 export function CenterEarningsCard({ centerId }: Props) {
   const { data, isLoading } = useCenterWallet(centerId);
 
@@ -96,7 +90,7 @@ function TxnRow({ txn }: { txn: CenterTransaction }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-navy-900 truncate">
           {txn.booking
-            ? `#${txn.booking.jobNumber} · ${SERVICE_TIER_LABEL[txn.booking.serviceTier] ?? txn.booking.serviceTier}`
+            ? `#${txn.booking.jobNumber} · ${txn.booking.serviceName ?? "Wash"}`
             : txn.description ?? (isCredit ? "Credit" : "Payout")}
         </p>
         <p className="text-xs text-text-muted">

@@ -8,6 +8,7 @@ import { useCenter } from "../hooks/useCenters";
 import { CenterDetailHeader } from "./center-detail/CenterDetailHeader";
 import { CenterInfoGrid } from "./center-detail/CenterInfoGrid";
 import { CenterBankCard } from "./center-detail/CenterBankCard";
+import { CenterServicesSection } from "./center-detail/CenterServicesSection";
 import { CenterPhotosGallery } from "./center-detail/CenterPhotosGallery";
 import { CenterDetailSkeleton } from "./center-detail/CenterDetailSkeleton";
 import { CenterEarningsCard } from "./center-detail/CenterEarningsCard";
@@ -40,6 +41,7 @@ export function CenterDetail({ id }: Props) {
       <Card className="overflow-hidden">
         <CenterDetailHeader center={center} />
         <CenterInfoGrid center={center} />
+        <CenterServicesSection center={center} />
         <CenterBankCard bankAccount={center.bankAccount} />
       </Card>
 

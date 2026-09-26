@@ -38,7 +38,7 @@ export type CenterTransaction = {
   createdAt: string;
   booking?: {
     jobNumber: number;
-    serviceTier: string;
+    serviceName: string | null; // null only for bookings made in a deploy window before backfill
     scheduledAt: string;
     amount: number;
   } | null;

@@ -339,8 +339,12 @@ export default function PrivacyPage() {
                     Retained for 7 years for tax and legal compliance.
                   </Item>
                   <Item label="Account Deletion">
-                    You can request account deletion by contacting us at{" "}
-                    <MailLink />.
+                    You can permanently delete your account at any time from
+                    the app under Profile → Delete Account. Deletion removes
+                    your login, name, phone number, profile photo and saved
+                    vehicles; transaction records are kept in anonymised form
+                    as described above. You can also request deletion by
+                    contacting us at <MailLink />.
                   </Item>
                 </List>
               </Section>
@@ -355,7 +359,8 @@ export default function PrivacyPage() {
                     Update or correct inaccurate information.
                   </Item>
                   <Item label="Deletion">
-                    Request deletion of your account and data.
+                    Delete your account and data from within the app (Profile →
+                    Delete Account).
                   </Item>
                   <Item label="Opt-Out">
                     Unsubscribe from promotional communications.

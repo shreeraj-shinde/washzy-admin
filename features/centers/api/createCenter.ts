@@ -2,11 +2,6 @@ import { apiClient } from "@/shared/lib/apiClient";
 import type { ApiSuccess } from "@/shared/types/api";
 import type { Center, CenterTier } from "./centers.types";
 
-export type ServiceTierKey =
-  | "STANDARD_WASH"
-  | "PREMIUM_DETAIL"
-  | "PRESIDENTIAL_LUXE";
-
 export type CenterDraftPayload = {
   name: string;
   phone: string;
@@ -14,7 +9,7 @@ export type CenterDraftPayload = {
   latitude?: number;
   longitude?: number;
   images?: string[];
-  serviceTiers?: ServiceTierKey[];
+  serviceIds?: string[];
   accountHolderName: string;
   accountNumber: string;
   ifscCode: string;
